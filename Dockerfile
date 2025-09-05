@@ -29,6 +29,10 @@ RUN apt-get update && apt-get install -y \
     calendar \
     intl
 
+# Instalar Redis
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
 # Habilitar mod_rewrite para Apache (necesario para Laravel)
 RUN a2enmod rewrite
 
