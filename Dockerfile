@@ -7,12 +7,15 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
     libpng-dev \
-    libjpeg-dev \
+    libjpeg62-turbo-dev \
     libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
     libicu-dev \
+    libwebp-dev \
+    libxpm-dev \
     curl \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-xpm \
     && docker-php-ext-install \
     pdo \
     pdo_mysql \
@@ -24,12 +27,10 @@ RUN apt-get update && apt-get install -y \
     zip \
     opcache \
     calendar \
-    intl 
+    intl
 
 # Habilitar mod_rewrite para Apache (necesario para Laravel)
 RUN a2enmod rewrite
-
-RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg
 
 # Establecer directorio de trabajo
 WORKDIR /var/www/html
