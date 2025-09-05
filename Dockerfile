@@ -22,7 +22,13 @@ RUN apt-get update && apt-get install -y \
     zip \
     opcache \
     calendar \
-    intl
+    intl \
+    libjpeg-dev \
+    libpng-dev \
+    libfreetype6-dev
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
 
 # Habilitar mod_rewrite para Apache (necesario para Laravel)
 RUN a2enmod rewrite
@@ -52,6 +58,42 @@ RUN echo '<Directory /var/www/html>\n\
 
 # Exponer el puerto 80
 EXPOSE 80
+
+ENV APP_ENV=local
+
+ENV APP_NAME=Bagisto
+ENV APP_ENV=local
+ENV APP_KEY=base64:IVCauzX+crlvfQvC9MGZ43U11DWn/8M5DAgYuqlZT08=
+ENV APP_DEBUG=true
+ENV APP_DEBUG_ALLOWED_IPS=
+ENV APP_URL=http://localhost
+ENV APP_ADMIN_URL=admin
+ENV APP_TIMEZONE=Asia/Kolkata
+
+ENV APP_LOCALE=en
+ENV APP_FALLBACK_LOCALE=en
+ENV APP_FAKER_LOCALE=en_US
+
+ENV APP_CURRENCY=USD
+
+ENV APP_MAINTENANCE_DRIVER=file
+# APP_MAINTENANCE_STORE=database
+
+ENV BCRYPT_ROUNDS=12
+
+ENV LOG_CHANNEL=stack
+ENV LOG_STACK=single
+ENV LOG_DEPRECATIONS_CHANNEL=null
+ENV LOG_LEVEL=debug
+
+ENV DB_CONNECTION="mysql"
+ENV DB_HOST="72.60.116.87"
+ENV DB_PORT="3306"
+ENV DB_DATABASE="lucella-db"
+ENV DB_USERNAME="root"
+ENV DB_PASSWORD="eFYw9gXZl2W5PCWgJCr2Gxeie9LUpSt6oaFL9kHckiUD6tYjm7qM1gEXg3eg3p2w"
+
+
 
 # Comando por defecto: iniciar Apache en primer plano
 CMD ["apache2-foreground"]
