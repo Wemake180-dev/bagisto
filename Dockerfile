@@ -93,6 +93,7 @@ ENV DB_USERNAME="root"
 ENV DB_PASSWORD="eFYw9gXZl2W5PCWgJCr2Gxeie9LUpSt6oaFL9kHckiUD6tYjm7qM1gEXg3eg3p2w"
 
 
+RUN php artisan storage:link
 
 # Comando por defecto: iniciar Apache en primer plano
 CMD ["apache2-foreground"]
