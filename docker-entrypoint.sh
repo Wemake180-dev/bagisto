@@ -3,6 +3,13 @@ set -e
 
 echo "Iniciando contenedor Laravel/Bagisto..."
 
+echo "Configurando storage..."
+if [ -L "/var/www/html/public/storage" ]; then
+    rm /var/www/html/public/storage
+fi
+ln -sfn /var/www/html/storage/app/public /var/www/html/public/storage
+
+
 # Esperar a que la BD esté disponible
 echo "Verificando conexión a la base de datos..."
 until php artisan migrate:status > /dev/null 2>&1; do
