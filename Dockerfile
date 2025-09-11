@@ -51,9 +51,6 @@ COPY . .
 # Instalar dependencias de PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Instalar dependencias de Node.js y compilar assets
-RUN npm install && npm run build
-
 # Crear directorio public en storage si no existe
 RUN mkdir -p /var/www/html/storage/app/public
 
