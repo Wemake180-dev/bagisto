@@ -103,6 +103,10 @@ ENV DB_DATABASE="lucella-db"
 ENV DB_USERNAME="root"
 ENV DB_PASSWORD="eFYw9gXZl2W5PCWgJCr2Gxeie9LUpSt6oaFL9kHckiUD6tYjm7qM1gEXg3eg3p2w"
 
+# Copiar y hacer ejecutable el script de entrada
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 
 
 # ejecutar script de entrada
