@@ -1,6 +1,10 @@
 # Imagen base oficial con PHP 8.4 y Apache
 FROM php:8.4-apache
 
+# Instalar Node.js 18.x
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
 # Instalar dependencias del sistema necesarias para Laravel y extensiones
 RUN apt-get update && apt-get install -y \
     git \
@@ -45,11 +49,17 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY . .
 
 # Instalar dependencias de PHP
-RUN composer install
+RUN composer install --no-dev --optimize-autoloader
+
+# Instalar dependencias de Node.js y compilar assets
+RUN npm install && npm run build
+
+# Crear directorio public en storage si no existe
+RUN mkdir -p /var/www/html/storage/app/public
 
 # Ajustar permisos (necesario para Laravel: storage y bootstrap/cache)
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
 
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
 
@@ -97,7 +107,7 @@ ENV DB_USERNAME="root"
 ENV DB_PASSWORD="eFYw9gXZl2W5PCWgJCr2Gxeie9LUpSt6oaFL9kHckiUD6tYjm7qM1gEXg3eg3p2w"
 
 
-RUN php artisan storage:link
 
-# Comando por defecto: iniciar Apache en primer plano
+# ejecutar script de entrada
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
