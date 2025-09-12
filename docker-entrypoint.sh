@@ -9,6 +9,26 @@ echo "DB_DATABASE: $DB_DATABASE"
 echo "DB_USERNAME: $DB_USERNAME"
 echo "=============================="
 
+# Test de conectividad TCP
+echo "1. Probando conectividad TCP..."
+timeout 10 bash -c "cat < /dev/null > /dev/tcp/$DB_HOST/$DB_PORT" && echo "✅ TCP conecta" || echo "❌ TCP falla"
+
+# Test con mysql command
+echo "2. Probando comando mysql directo..."
+mysql -h$DB_HOST -P$DB_PORT -u$DB_USERNAME -p$DB_PASSWORD -e "SELECT 1 as test;" 2>&1 | head -10
+
+echo "3. Listando bases de datos disponibles..."
+mysql -h$DB_HOST -P$DB_PORT -u$DB_USERNAME -p$DB_PASSWORD -e "SHOW DATABASES;" 2>&1 | head -10
+
+echo "4. Probando Laravel config..."
+php artisan config:clear
+php artisan config:cache
+
+echo "5. Test de Laravel migrate:status con debug..."
+php artisan migrate:status --verbose 2>&1 | head -15
+
+echo "=========================="
+
 echo "Configurando storage..."
 if [ -L "/var/www/html/public/storage" ]; then
     rm /var/www/html/public/storage
