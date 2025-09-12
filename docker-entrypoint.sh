@@ -2,6 +2,12 @@
 set -e
 
 echo "Iniciando contenedor Laravel/Bagisto..."
+echo "=== CONFIGURACIÓN ACTUAL ==="
+echo "DB_HOST: $DB_HOST"
+echo "DB_PORT: $DB_PORT"
+echo "DB_DATABASE: $DB_DATABASE"
+echo "DB_USERNAME: $DB_USERNAME"
+echo "=============================="
 
 echo "Configurando storage..."
 if [ -L "/var/www/html/public/storage" ]; then
