@@ -37,11 +37,21 @@ php artisan migrate:install --force > /dev/null 2>&1 || true
 echo "Ejecutando migraciones..."
 php artisan migrate --force
 
-# Solo en desarrollo: ejecutar seeders
-if [ "$APP_ENV" = "local" ] || [ "$RUN_SEEDERS" = "true" ]; then
-    echo "Ejecutando seeders..."
+# Ejecutar seeders y crear archivo marcador
+echo "Verificando si es primera instalación..."
+if [ ! -f "/var/www/html/.bagisto_installed" ]; then
+    echo "Primera instalación detectada. Ejecutando seeders..."
     php artisan db:seed --force
+    
+    # Crear archivo marcador
+    touch /var/www/html/.bagisto_installed
+    echo "Seeders completados y marcador creado."
+else
+    echo "Instalación existente detectada. Verificando imágenes de productos..."
+    # Verificar si faltan imágenes de productos incluso en instalaciones existentes
+    php /var/www/html/generate-product-images.php
 fi
+
 
 # Optimizaciones
 echo "Optimizando aplicación..."
