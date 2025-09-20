@@ -37,21 +37,37 @@ php artisan migrate:install --force > /dev/null 2>&1 || true
 echo "Ejecutando migraciones..."
 php artisan migrate --force
 
-# Ejecutar seeders y crear archivo marcador
-echo "Verificando si es primera instalación..."
-if [ ! -f "/var/www/html/.bagisto_installed" ]; then
-    echo "Primera instalación detectada. Ejecutando seeders..."
-    php artisan db:seed --force
+# Verificar si debemos ejecutar seeders
+if [ "$SKIP_DB_SEED" != "true" ]; then
+    echo "Verificando si la base de datos necesita seeders..."
     
-    # Crear archivo marcador
-    touch /var/www/html/.bagisto_installed
-    echo "Seeders completados y marcador creado."
+    # Verificar si la tabla cms_page_channels está vacía
+    TABLE_COUNT=$(php -r "
+    try {
+        \$pdo = new PDO('mysql:host='.\$_ENV['DB_HOST'].';port='.\$_ENV['DB_PORT'].';dbname='.\$_ENV['DB_DATABASE'], \$_ENV['DB_USERNAME'], \$_ENV['DB_PASSWORD']);
+        \$stmt = \$pdo->query('SELECT COUNT(*) FROM cms_page_channels');
+        if (\$stmt) {
+            echo \$stmt->fetchColumn();
+        } else {
+            echo '0';
+        }
+    } catch(Exception \$e) {
+        echo '0';
+    }
+    " 2>/dev/null || echo "0")
+    
+    if [ "$TABLE_COUNT" = "0" ] || [ -z "$TABLE_COUNT" ]; then
+        echo "Base de datos vacía. Ejecutando seeders..."
+        php artisan db:seed --force || {
+            echo "Advertencia: Algunos seeders fallaron, pero continuando..."
+        }
+        echo "Seeders completados."
+    else
+        echo "Base de datos ya tiene $TABLE_COUNT registros. Saltando seeders..."
+    fi
 else
-    echo "Instalación existente detectada. Verificando imágenes de productos..."
-    # Verificar si faltan imágenes de productos incluso en instalaciones existentes
-    php /var/www/html/generate-product-images.php
+    echo "SKIP_DB_SEED está activo, saltando verificación de seeders..."
 fi
-
 
 # Optimizaciones
 echo "Optimizando aplicación..."
